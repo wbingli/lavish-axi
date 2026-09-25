@@ -56,7 +56,7 @@ import {
   telemetryCommandName,
   VERSION,
 } from "../src/cli.js";
-import { DESIGN_PRIORITY_RULE, DESIGN_SYSTEM_HINT } from "../src/design-reference.js";
+import { DESIGN_CDN_URLS, DESIGN_PRIORITY_RULE, DESIGN_SYSTEM_HINT } from "../src/design-reference.js";
 import { resolveVsCodeSettingsFile } from "../src/plugin.js";
 import { createSkillMarkdown } from "../src/skill.js";
 import { SELF_PAINT_WARNING } from "../src/self-paint.js";
@@ -414,16 +414,25 @@ test("design output prints copy-pasteable CDN URLs so agents can opt in to Daisy
   assert.ok(output.reference.mockup.notes.some((item) => item.includes("line numbers")));
 });
 
-test("design output defaults to themes with neutral body text and warns against @apply on DaisyUI classes", () => {
+test("design output defaults to the lavish theme and warns against @apply on DaisyUI classes", () => {
   const output = createDesignOutput();
 
-  // luxury sets base-content to gold and primary to white, so every paragraph is already the
-  // accent and nothing is left to mark what needs the reviewer.
-  assert.ok(
-    output.theme_usage.some(
-      (item) => /default to.*data-theme="night"/i.test(item) && /data-theme="corporate"/.test(item),
-    ),
+  // The shared stylesheet ships in the snippet, and the default theme follows the editor.
+  assert.match(
+    output.design.cdn_snippet,
+    /cdn\.jsdelivr\.net\/gh\/wbingli\/lavish-axi@lavish-themes-v\d+\/src\/design\/lavish-themes\.css/,
   );
+  assert.equal(output.design.cdn_urls.lavishThemes, DESIGN_CDN_URLS.lavishThemes);
+  assert.ok(output.theme_usage.some((item) => /^Default to `<html data-theme="lavish">`/.test(item)));
+  assert.deepEqual(output.lavish_themes, [
+    "lavish",
+    "lavish-paper",
+    "lavish-brass",
+    "lavish-daylight",
+    "lavish-graphite",
+    "lavish-fjord",
+  ]);
+  // luxury sets base-content to gold and primary to white, so it stays available but discouraged.
   assert.ok(output.theme_usage.some((item) => /luxury/.test(item) && /gold/i.test(item)));
   assert.ok(output.themes.includes("luxury"), "luxury stays available when the user asks for it");
   assert.ok(output.theme_usage.some((item) => item.includes("@apply") && /daisyui/i.test(item)));
@@ -437,13 +446,17 @@ test("design output spends one accent on what needs the reviewer and builds text
   assert.ok(output.theme_usage.some((item) => /opacity/i.test(item) && /4\.5:1/.test(item)));
 });
 
-test("design output lets an artifact follow the editor theme only on request", () => {
+test("design output names the lavish roles, the highlighter and the helpers, and the non-DaisyUI hook", () => {
   const output = createDesignOutput();
-  const item = output.theme_usage.find((entry) => entry.includes("data-lavish-theme"));
+  const roles = output.theme_usage.find((entry) => entry.includes("lv-effect"));
 
-  assert.ok(item, "the design output must name the data-lavish-theme attribute");
-  assert.match(item, /^Only when the user asks/);
-  assert.match(item, /opened directly/);
+  assert.ok(roles, "the design output must name the lavish helpers");
+  assert.match(roles, /`primary` is the decision accent/);
+  assert.match(roles, /highlighter/);
+  assert.match(roles, /lv-option/);
+  const hook = output.theme_usage.find((entry) => entry.includes("data-lavish-theme"));
+  assert.match(hook, /does not use DaisyUI/);
+  assert.match(hook, /opened directly/);
 });
 
 test("playbook index output lists known playbooks with concise descriptions", () => {

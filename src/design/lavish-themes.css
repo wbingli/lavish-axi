@@ -1,0 +1,337 @@
+/*
+ * Lavish artifact themes - five DaisyUI v5 themes that share one focus system.
+ *
+ *   <html data-theme="lavish">        follows the reviewer's Lavish editor theme while Lavish
+ *                                      serves the page, and the OS light/dark setting when the
+ *                                      file is opened directly (Paper light, Brass dark).
+ *   <html data-theme="lavish-paper">  a fixed palette: lavish-paper, lavish-brass,
+ *                                      lavish-daylight, lavish-graphite, lavish-fjord.
+ *
+ * Roles: primary = what needs the reviewer's decision (the only accent); success = done;
+ * warning = acts outside the page / attention; error = danger. Secondary, accent, neutral and
+ * info are plain ink, so a stray badge never adds a second accent. <mark> is a highlighter
+ * stroke for the one fact that decides a question. Load after daisyui.css.
+ */
+
+[data-theme="lavish"],
+[data-theme="lavish-paper"],
+[data-theme="lavish"][data-lavish-theme="paper"] {
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #faf9f5;
+  --color-base-300: #e6e3da;
+  --color-base-content: #141413;
+  --color-primary: #b04a20;
+  --color-primary-content: #ffffff;
+  --color-secondary: #3d3d3a;
+  --color-secondary-content: #ffffff;
+  --color-accent: #3d3d3a;
+  --color-accent-content: #ffffff;
+  --color-neutral: #141413;
+  --color-neutral-content: #ffffff;
+  --color-info: #3d3d3a;
+  --color-info-content: #ffffff;
+  --color-success: #46652b;
+  --color-success-content: #ffffff;
+  --color-warning: #7a5500;
+  --color-warning-content: #ffffff;
+  --color-error: #b3261e;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.625rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --lv-ink-2: #3d3d3a;
+  --lv-ink-3: #6b6a63;
+  --lv-strong: #cfcbbf;
+  --lv-line: #d2683f;
+  --lv-decide-tint: #fbeee7;
+  --lv-done: #46652b;
+  --lv-done-tint: #edf2e3;
+  --lv-attn: #7a5500;
+  --lv-attn-tint: #f8edcf;
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-theme="lavish"]:not([data-lavish-theme]) {
+    color-scheme: dark;
+    --color-base-100: #171a21;
+    --color-base-200: #0f1115;
+    --color-base-300: #2a2f3a;
+    --color-base-content: #f7f3ea;
+    --color-primary: #f4c95d;
+    --color-primary-content: #17130a;
+    --color-secondary: #c9cfdb;
+    --color-secondary-content: #171a21;
+    --color-accent: #c9cfdb;
+    --color-accent-content: #171a21;
+    --color-neutral: #f7f3ea;
+    --color-neutral-content: #171a21;
+    --color-info: #c9cfdb;
+    --color-info-content: #171a21;
+    --color-success: #8fe39e;
+    --color-success-content: #0f1115;
+    --color-warning: #ff9e6b;
+    --color-warning-content: #1a0f08;
+    --color-error: #f06464;
+    --color-error-content: #1a0808;
+    --radius-selector: 0.5rem;
+    --radius-field: 0.625rem;
+    --radius-box: 1rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
+    --lv-ink-2: #c9cfdb;
+    --lv-ink-3: #8f99ad;
+    --lv-strong: #3c4557;
+    --lv-line: #f4c95d;
+    --lv-decide-tint: #262112;
+    --lv-done: #8fe39e;
+    --lv-done-tint: #16241a;
+    --lv-attn: #ff9e6b;
+    --lv-attn-tint: #2c1b12;
+  }
+}
+
+[data-theme="lavish-brass"],
+[data-theme="lavish"][data-lavish-theme="brass"] {
+  color-scheme: dark;
+  --color-base-100: #171a21;
+  --color-base-200: #0f1115;
+  --color-base-300: #2a2f3a;
+  --color-base-content: #f7f3ea;
+  --color-primary: #f4c95d;
+  --color-primary-content: #17130a;
+  --color-secondary: #c9cfdb;
+  --color-secondary-content: #171a21;
+  --color-accent: #c9cfdb;
+  --color-accent-content: #171a21;
+  --color-neutral: #f7f3ea;
+  --color-neutral-content: #171a21;
+  --color-info: #c9cfdb;
+  --color-info-content: #171a21;
+  --color-success: #8fe39e;
+  --color-success-content: #0f1115;
+  --color-warning: #ff9e6b;
+  --color-warning-content: #1a0f08;
+  --color-error: #f06464;
+  --color-error-content: #1a0808;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.625rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --lv-ink-2: #c9cfdb;
+  --lv-ink-3: #8f99ad;
+  --lv-strong: #3c4557;
+  --lv-line: #f4c95d;
+  --lv-decide-tint: #262112;
+  --lv-done: #8fe39e;
+  --lv-done-tint: #16241a;
+  --lv-attn: #ff9e6b;
+  --lv-attn-tint: #2c1b12;
+}
+
+[data-theme="lavish-daylight"],
+[data-theme="lavish"][data-lavish-theme="daylight"] {
+  color-scheme: light;
+  --color-base-100: #ffffff;
+  --color-base-200: #f4f6f9;
+  --color-base-300: #dde2ea;
+  --color-base-content: #0f172a;
+  --color-primary: #1d4ed8;
+  --color-primary-content: #ffffff;
+  --color-secondary: #334155;
+  --color-secondary-content: #ffffff;
+  --color-accent: #334155;
+  --color-accent-content: #ffffff;
+  --color-neutral: #0f172a;
+  --color-neutral-content: #ffffff;
+  --color-info: #334155;
+  --color-info-content: #ffffff;
+  --color-success: #156b3a;
+  --color-success-content: #ffffff;
+  --color-warning: #8a4b00;
+  --color-warning-content: #ffffff;
+  --color-error: #c62828;
+  --color-error-content: #ffffff;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.625rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --lv-ink-2: #334155;
+  --lv-ink-3: #56627a;
+  --lv-strong: #c3cad6;
+  --lv-line: #2f62f0;
+  --lv-decide-tint: #eaf0ff;
+  --lv-done: #156b3a;
+  --lv-done-tint: #e5f3ea;
+  --lv-attn: #8a4b00;
+  --lv-attn-tint: #fdf0d9;
+}
+
+[data-theme="lavish-graphite"],
+[data-theme="lavish"][data-lavish-theme="graphite"] {
+  color-scheme: dark;
+  --color-base-100: #15171a;
+  --color-base-200: #0c0d0f;
+  --color-base-300: #272b31;
+  --color-base-content: #f1f2f4;
+  --color-primary: #a596ff;
+  --color-primary-content: #0d0a1f;
+  --color-secondary: #bec3cb;
+  --color-secondary-content: #15171a;
+  --color-accent: #bec3cb;
+  --color-accent-content: #15171a;
+  --color-neutral: #f1f2f4;
+  --color-neutral-content: #15171a;
+  --color-info: #bec3cb;
+  --color-info-content: #15171a;
+  --color-success: #6bd59e;
+  --color-success-content: #0c0d0f;
+  --color-warning: #f2b955;
+  --color-warning-content: #1f1606;
+  --color-error: #ff7b72;
+  --color-error-content: #1a0806;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.625rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --lv-ink-2: #bec3cb;
+  --lv-ink-3: #8d939d;
+  --lv-strong: #3a3f48;
+  --lv-line: #9383ff;
+  --lv-decide-tint: #1e1a36;
+  --lv-done: #6bd59e;
+  --lv-done-tint: #12251b;
+  --lv-attn: #f2b955;
+  --lv-attn-tint: #2a2110;
+}
+
+[data-theme="lavish-fjord"],
+[data-theme="lavish"][data-lavish-theme="fjord"] {
+  color-scheme: dark;
+  --color-base-100: #112033;
+  --color-base-200: #0b1624;
+  --color-base-300: #1e3148;
+  --color-base-content: #eaf2fb;
+  --color-primary: #55d2e6;
+  --color-primary-content: #04212a;
+  --color-secondary: #b3c3d6;
+  --color-secondary-content: #112033;
+  --color-accent: #b3c3d6;
+  --color-accent-content: #112033;
+  --color-neutral: #eaf2fb;
+  --color-neutral-content: #112033;
+  --color-info: #b3c3d6;
+  --color-info-content: #112033;
+  --color-success: #8cd68f;
+  --color-success-content: #0b1624;
+  --color-warning: #f4b860;
+  --color-warning-content: #231704;
+  --color-error: #ff8a80;
+  --color-error-content: #1a0806;
+  --radius-selector: 0.5rem;
+  --radius-field: 0.625rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  --lv-ink-2: #b3c3d6;
+  --lv-ink-3: #8599b1;
+  --lv-strong: #2e4764;
+  --lv-line: #3fc4da;
+  --lv-decide-tint: #0f2e3e;
+  --lv-done: #8cd68f;
+  --lv-done-tint: #122d20;
+  --lv-attn: #f4b860;
+  --lv-attn-tint: #2e2414;
+}
+
+/* The deciding fact, drawn like a highlighter pen: bright yellow with soft ends, dark ink on
+   every palette so it reads the same in light and dark themes. */
+:where([data-theme^="lavish"]) mark {
+  color: #1b1a17;
+  background: linear-gradient(
+    100deg,
+    rgb(255 226 0 / 0) 0.6%,
+    rgb(255 226 0 / 0.95) 2.6%,
+    rgb(255 219 0 / 0.85) 96%,
+    rgb(255 226 0 / 0) 99.4%
+  );
+  padding: 0.05em 0.3em;
+  margin: 0 -0.05em;
+  border-radius: 0.35em 0.6em 0.4em 0.7em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+/* Real text colors for hierarchy instead of one ink at stepped opacity. */
+.lv-ink-2 {
+  color: var(--lv-ink-2);
+}
+.lv-ink-3 {
+  color: var(--lv-ink-3);
+}
+
+/* What an option will do, shown beside it. lv-effect-out = acts outside the page. */
+.lv-effect {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  width: max-content;
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  background: var(--color-base-200);
+  color: var(--lv-ink-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.lv-effect-out {
+  background: var(--lv-attn-tint);
+  color: var(--lv-attn);
+}
+.lv-effect-out::before {
+  content: "\2197";
+}
+.lv-done {
+  background: var(--lv-done-tint);
+  color: var(--lv-done);
+}
+
+/* A visible choice: a label wrapping a native radio or checkbox. */
+.lv-option {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--lv-strong);
+  border-radius: var(--radius-box);
+  background: var(--color-base-100);
+  cursor: pointer;
+}
+.lv-option:has(input:checked) {
+  border-color: var(--lv-line);
+  box-shadow: inset 0 0 0 1px var(--lv-line);
+  background: var(--lv-decide-tint);
+}

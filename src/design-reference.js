@@ -4,16 +4,31 @@ export const TAILWIND_BROWSER_VERSION = "4.2.4";
 export const DAISYUI_VERSION = "5.5.19";
 export const MERMAID_VERSION = "11.15.0";
 
+// This fork's shared artifact themes, served by jsDelivr from a pinned tag of the fork so a
+// published page never changes under its reader. Bump the tag (and push it) when
+// src/design/lavish-themes.css changes.
+export const LAVISH_THEMES_REF = "lavish-themes-v1";
+export const LAVISH_THEMES = [
+  "lavish",
+  "lavish-paper",
+  "lavish-brass",
+  "lavish-daylight",
+  "lavish-graphite",
+  "lavish-fjord",
+];
+
 export const DESIGN_CDN_URLS = {
   tailwind: `https://cdn.jsdelivr.net/npm/@tailwindcss/browser@${TAILWIND_BROWSER_VERSION}/dist/index.global.js`,
   daisyui: `https://cdn.jsdelivr.net/npm/daisyui@${DAISYUI_VERSION}/daisyui.css`,
   daisyuiThemes: `https://cdn.jsdelivr.net/npm/daisyui@${DAISYUI_VERSION}/themes.css`,
+  lavishThemes: `https://cdn.jsdelivr.net/gh/wbingli/lavish-axi@${LAVISH_THEMES_REF}/src/design/lavish-themes.css`,
 };
 
 export const MERMAID_CDN_URL = `https://cdn.jsdelivr.net/npm/mermaid@${MERMAID_VERSION}/dist/mermaid.esm.min.mjs`;
 
 export const DESIGN_CDN_SNIPPET = `<link rel="stylesheet" href="${DESIGN_CDN_URLS.daisyui}">
 <link rel="stylesheet" href="${DESIGN_CDN_URLS.daisyuiThemes}">
+<link rel="stylesheet" href="${DESIGN_CDN_URLS.lavishThemes}">
 <script src="${DESIGN_CDN_URLS.tailwind}"></script>`;
 
 export const MERMAID_CDN_SNIPPET = `<script type="module">
@@ -233,9 +248,10 @@ export function createDesignOutput() {
       how: 'Append one entry per round to the `data-lavish-revisions` JSON (oldest first, stable `id`s), and put `data-lavish-revision="<id>"` on each block you actually edited or added. Lavish reads them and never restyles the page, so the saved file looks the same opened directly.',
     },
     theme_usage: [
-      'Default to `<html data-theme="night">` for a dark page or `<html data-theme="corporate">` for a light one: both keep body text neutral, so `primary` is free to mark what needs the reviewer. Pick a different theme from the list below only when the user asked for one or the content clearly calls for it. Avoid `luxury` for review surfaces unless asked - its base text is gold and its `primary` is white, so every paragraph already reads as emphasis.',
+      'Default to `<html data-theme="lavish">` (the CDN snippet loads it): it follows the reviewer\'s Lavish editor theme - Paper, Brass, Daylight, Graphite or Fjord - while Lavish serves the page, and the OS light/dark setting when the file is opened directly. Use a fixed palette (`lavish-paper`, `lavish-brass`, `lavish-daylight`, `lavish-graphite`, `lavish-fjord`) only when the user wants one look regardless of the editor, and another DaisyUI theme only when the user names it. Avoid `luxury` for review surfaces - its base text is gold and its `primary` is white, so every paragraph already reads as emphasis.',
       "Spend `primary` only on what needs the reviewer - an open question, the chosen option, the control that submits it. Headings, links, labels, section numbers, and finished work stay in the base text colors; an accent that marks everything marks nothing.",
-      "Only when the user asks the artifact to follow the Lavish editor theme: Lavish sets `data-lavish-theme` on the artifact's `<html>` to the reviewer's editor theme (`brass`, `paper`, `daylight`, `graphite`, `fjord`), so key your palettes off `html[data-lavish-theme=\"paper\"]` and friends, and keep a complete default for when the file is opened directly and the attribute is absent.",
+      'In the lavish themes `primary` is the decision accent, `success` is done, `warning` marks what acts outside the page, and `error` is danger; `secondary`, `accent`, `neutral` and `info` are plain ink, so reach for `primary` alone to draw the eye. `<mark>` renders as a highlighter stroke - use it once per question, on the fact that decides it. Helpers: `lv-ink-2` / `lv-ink-3` for quieter and muted text; `<span class="lv-effect lv-effect-out">Posts 3 messages</span>`, `<span class="lv-effect">No side effects</span>` and `lv-effect lv-done` beside options; `<label class="lv-option"><input type="radio" ...> ...</label>` for a visible choice that rings when selected.',
+      'A page that does not use DaisyUI can still follow the editor: Lavish sets `data-lavish-theme` on the artifact\'s `<html>` (`paper`, `brass`, `daylight`, `graphite`, `fjord`), so key hand-written palettes off `html[data-lavish-theme="paper"]` and friends, with a complete default for when the file is opened directly.',
       "Build text hierarchy from distinct text colors (for example `text-base-content` for questions and key facts, a quieter tone for explanations, a muted tone for sources and timestamps) rather than one color at stepped opacity, and keep every level at 4.5:1 contrast or better against its surface.",
       'Set a nested section theme with `<section data-theme="night">`.',
       "Prefer semantic colors such as `bg-base-100`, `bg-base-200`, `text-base-content`, `bg-primary`, `text-primary-content`, `alert-warning`, and `btn-primary` so themes remain readable.",
@@ -243,6 +259,7 @@ export function createDesignOutput() {
       "Use Tailwind responsive prefixes such as `sm:`, `md:`, `lg:`, and `xl:` for layout changes.",
       'Never `@apply` DaisyUI classes (such as `text-base-content/40`, `bg-base-200`, or `btn`) inside `<style type="text/tailwindcss">` - the Tailwind browser runtime does not know them, and one unknown utility aborts the entire compile, leaving the page with no Tailwind styles at all. Put DaisyUI classes directly on elements, or write plain CSS with theme variables such as `var(--color-base-200)`.',
     ],
+    lavish_themes: LAVISH_THEMES,
     themes: DAISYUI_THEMES,
     components: {
       actions: ["button", "dropdown", "fab", "modal", "swap", "theme-controller"],
