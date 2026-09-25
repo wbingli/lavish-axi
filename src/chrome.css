@@ -1248,6 +1248,31 @@ body.lavish {
 .bubble-text {
   white-space: pre-wrap;
 }
+.bubble-summary {
+  font-weight: var(--w-semi);
+}
+.bubble-agent-text {
+  margin-top: 6px;
+}
+.bubble-agent-text > summary {
+  cursor: pointer;
+  font-size: var(--text-xs);
+  color: var(--fg-label);
+}
+.bubble-agent-text > summary:hover {
+  color: var(--fg);
+}
+.bubble-agent-text > .bubble-text {
+  margin-top: 6px;
+  padding: 8px 10px;
+  max-height: 240px;
+  overflow: auto;
+  border-radius: var(--radius-sm);
+  border: var(--hairline-subtle);
+  background: var(--bg);
+  color: var(--fg-muted);
+  font-size: var(--text-xs);
+}
 /* Consecutive items from one send sit closer, so a batch reads as a group. */
 .bubble.user + .bubble.user {
   margin-top: -4px;

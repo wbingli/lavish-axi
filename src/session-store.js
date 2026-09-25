@@ -786,6 +786,10 @@ function normalizePrompt(prompt) {
   };
   const promptId = normalizePromptId(prompt.prompt_id);
   if (promptId) normalized.prompt_id = promptId;
+  // A page-queued note's short label for the Conversation panel. Display-only: the transcript
+  // keeps it and agentFacingPrompt strips it, so what the agent receives never changes.
+  const summary = typeof prompt.summary === "string" ? prompt.summary.trim().slice(0, 200) : "";
+  if (summary) normalized.summary = summary;
   const target = normalizeTarget(prompt.target);
   if (target) normalized.target = target;
   const { refs, malformed } = normalizeAttachmentRefs(prompt.attachments);
@@ -793,12 +797,15 @@ function normalizePrompt(prompt) {
   return { prompt: normalized, malformed };
 }
 
-// Settlement identity is transcript-owned. The agent-facing prompt list must not carry it:
-// poll output stays the reviewer's words, and a restore replay never re-appends chat.
+// Settlement identity and the display summary are transcript-owned. The agent-facing prompt
+// list must not carry them: poll output stays the reviewer's words, and a restore replay never
+// re-appends chat.
 function agentFacingPrompt(prompt) {
-  if (!prompt || typeof prompt !== "object" || prompt.prompt_id === undefined) return prompt;
+  if (!prompt || typeof prompt !== "object") return prompt;
+  if (prompt.prompt_id === undefined && prompt.summary === undefined) return prompt;
   const rest = { ...prompt };
   delete rest.prompt_id;
+  delete rest.summary;
   return rest;
 }
 

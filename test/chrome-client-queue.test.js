@@ -8443,3 +8443,74 @@ test("each artifact load asks for the current chrome theme so the SDK applies it
   await flushPromises();
   assert.match(chrome.frame.src, /[?&]lavish_theme=paper(&|$)/);
 });
+
+const PAGE_NOTE =
+  "D1: Re-approve the PR at head 2e5941be (verify the head is unchanged, approve, read back the review). Approval only, no merge." +
+  '\n\nContext data:\n{\n  "question": "d1",\n  "answer": "approve"\n}';
+
+test("a long page-queued note leads with its summary and folds what the agent receives", async () => {
+  const chrome = await createChromeHarness();
+  chrome.sendFrameMessage({
+    type: "lavish:queuePrompt",
+    prompt: { prompt: PAGE_NOTE, selector: "form", tag: "choice", text: "#1016: approve", summary: "#1016: approve" },
+  });
+  const html = chrome.element("queuedLog").innerHTML;
+
+  assert.match(html, /<div class="bubble-text bubble-summary">#1016: approve<\/div>/);
+  assert.match(
+    html,
+    /<details class="bubble-agent-text"><summary>What the agent receives<\/summary><div class="bubble-text">D1: Re-approve[^<]*Context data:/,
+  );
+  // The anchor keeps its kind but does not repeat the summary as its excerpt.
+  assert.doesNotMatch(html, /anchor-excerpt/);
+  // What is queued for the agent is untouched.
+  assert.equal(chrome.queued()[0].prompt, PAGE_NOTE);
+});
+
+test("a short page note and a reviewer's own note are never folded", async () => {
+  const chrome = await createChromeHarness();
+  chrome.sendFrameMessage({
+    type: "lavish:queuePrompt",
+    prompt: {
+      prompt: "D-01: Keep all drafts unsent.",
+      selector: "form",
+      tag: "choice",
+      text: "D-01 · Keep",
+      summary: "D-01 · Keep",
+    },
+  });
+  chrome.sendFrameMessage({
+    type: "lavish:queuePrompt",
+    prompt: { prompt: "Line one\nLine two of my own note", selector: "h2", tag: "h2", text: "Phase 1" },
+  });
+  const html = chrome.element("queuedLog").innerHTML;
+
+  assert.doesNotMatch(html, /bubble-agent-text/);
+  assert.match(html, /D-01: Keep all drafts unsent\./);
+  assert.match(html, /Line one\nLine two of my own note/);
+});
+
+test("a sent page note keeps the same folded shape in the transcript", async () => {
+  const chrome = await createChromeHarness({
+    sessionData: {
+      ...defaultSessionData,
+      initialChat: [
+        {
+          role: "user",
+          kind: "annotation",
+          text: PAGE_NOTE,
+          summary: "#1016: approve",
+          anchor: { kind: "element", label: "<choice>", excerpt: "#1016: approve" },
+          at: "2026-09-25T10:00:00Z",
+        },
+      ],
+    },
+  });
+  const bubble = chrome
+    .element("chatLog")
+    .children.map((child) => child.innerHTML)
+    .join("");
+
+  assert.match(bubble, /bubble-summary">#1016: approve</);
+  assert.match(bubble, /What the agent receives/);
+});

@@ -597,6 +597,36 @@ function userBubbleTextHtml(entry, text) {
   return displayText ? '<div class="bubble-text">' + escapeHtml(displayText) + "</div>" : "";
 }
 
+// A note the artifact's own code queued can carry far more than the choice the reviewer made: a
+// full instruction for the agent, often with Context data appended. When it does, the bubble
+// leads with the page's short summary and folds the exact text the agent receives behind a
+// disclosure. The reviewer's own notes carry no summary and are never folded.
+function foldedNoteSummary(entry, text) {
+  const summary = typeof entry?.summary === "string" ? entry.summary.trim() : "";
+  if (!summary) return "";
+  const full = String(text || "");
+  return full.includes("\n") || full.length > summary.length + 40 ? summary : "";
+}
+
+// Queued and sent bubbles share this body so a note never changes shape when it settles.
+function userBubbleBodyHtml(entry, anchor, text) {
+  const summary = foldedNoteSummary(entry, text);
+  if (!summary) return anchorHtml(anchor) + userBubbleTextHtml(entry, text);
+  // The anchor's excerpt is usually the same label; keep its kind and drop the repeat.
+  const quietAnchor =
+    anchor && typeof anchor === "object" && String(anchor.excerpt || "").trim() === summary
+      ? { ...anchor, excerpt: "" }
+      : anchor;
+  return (
+    anchorHtml(quietAnchor) +
+    '<div class="bubble-text bubble-summary">' +
+    escapeHtml(summary) +
+    '</div><details class="bubble-agent-text"><summary>What the agent receives</summary><div class="bubble-text">' +
+    escapeHtml(String(text || "")) +
+    "</div></details>"
+  );
+}
+
 // A queued note is the user bubble in its not-yet-sent state: dashed, labelled Queued (Sending
 // while its batch is in flight), and removable until then. It settles in place as a sent bubble
 // once the server's transcript carries it, so nothing moves between regions.
@@ -610,8 +640,7 @@ function queuedBubbleHtml(prompt, index) {
     '">' +
     REMOVE_ICON_SVG +
     "</button></small>" +
-    anchorHtml(promptAnchor(prompt)) +
-    userBubbleTextHtml(prompt, prompt.prompt) +
+    userBubbleBodyHtml(prompt, promptAnchor(prompt), prompt.prompt) +
     bubbleAttachmentsHtml(prompt) +
     "</div>"
   );
@@ -849,12 +878,7 @@ function chatBubbleHtml(entry) {
         : '<div class="bubble-text">' + escapeHtml(entry.text) + "</div>")
     );
   }
-  return (
-    "<small>You</small>" +
-    anchorHtml(entry.anchor) +
-    userBubbleTextHtml(entry, entry.text) +
-    bubbleAttachmentsHtml(entry)
-  );
+  return "<small>You</small>" + userBubbleBodyHtml(entry, entry.anchor, entry.text) + bubbleAttachmentsHtml(entry);
 }
 
 function addChat(entry, shouldScroll = true) {

@@ -6615,3 +6615,13 @@ test("the SDK applies the reviewer's chrome theme at startup, falling back to th
   const fallback = JSON.parse(unknown.match(/, (\{"acceptedImageMime"[^\n]*\})\);\n\}\)\(\);$/)[1]);
   assert.deepEqual(fallback.chromeTheme, { id: "brass", tokens: null });
 });
+
+test("only notes the page's own code queues carry a display summary", () => {
+  const js = createSdkJs("abc");
+
+  // The public API marks its notes; the annotation card calls the same function without the flag.
+  assert.match(js, /queuePrompt: \(prompt, options\) => queuePrompt\(prompt, options, \{ fromPage: true \}\)/);
+  assert.match(js, /queuePrompt\(prompt, \{ \.\.\.c, queueKey: "", attachments: readyAttachments \}\)/);
+  // The summary is taken before Context data is appended, so it is the page's label, not JSON.
+  assert.ok(js.indexOf("item.summary = summary") < js.indexOf('"\\n\\nContext data:\\n"'));
+});

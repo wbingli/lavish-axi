@@ -1264,9 +1264,13 @@ export function createArtifactSdk(
     setMermaidFrozen(annotationMode);
   }
 
-  function queuePrompt(prompt, options = {}) {
+  // `fromPage` marks a note the artifact's own code queued (window.lavish.queuePrompt), as opposed
+  // to one the reviewer wrote in the annotation card. Such notes carry a short display summary -
+  // the label the page passed as `text`, else the prompt's first line - so the Conversation panel
+  // can lead with it and fold the full agent-facing text. The server strips it before delivery.
+  function queuePrompt(prompt, options = {}, { fromPage = false } = {}) {
     const originElement = options.element || document.activeElement || document.body;
-    /** @type {{ uid: string, prompt: string, selector: string, tag: string, text: string, target?: unknown, attachments?: Array<{ id: string, name?: string }>, _lavishQueueKey?: string }} */
+    /** @type {{ uid: string, prompt: string, selector: string, tag: string, text: string, target?: unknown, attachments?: Array<{ id: string, name?: string }>, _lavishQueueKey?: string, summary?: string }} */
     const item = {
       ...context(originElement),
       prompt: String(prompt || ""),
@@ -1279,6 +1283,11 @@ export function createArtifactSdk(
     if (options.tag) item.tag = String(options.tag);
     if (options.text) item.text = String(options.text);
     if (options.target) item.target = options.target;
+    if (fromPage) {
+      const label = options.text ? String(options.text) : String(prompt || "").split("\n")[0];
+      const summary = label.trim().slice(0, 200);
+      if (summary) item.summary = summary;
+    }
     if (options.data) item.prompt += "\n\nContext data:\n" + JSON.stringify(options.data, null, 2);
     // Attach only the client-controllable fields (server-vetted id + display name);
     // the chrome forwards these and the server re-resolves each id (see queuePrompts).
@@ -2512,7 +2521,7 @@ export function createArtifactSdk(
   }
 
   /** @type {Window & { lavish?: unknown }} */ (window).lavish = {
-    queuePrompt,
+    queuePrompt: (prompt, options) => queuePrompt(prompt, options, { fromPage: true }),
     sendQueuedPrompts,
     endSession,
     getQueuedPrompts: () => [],

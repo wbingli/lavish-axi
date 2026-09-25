@@ -2406,6 +2406,41 @@ test("queuePrompts stores the prompt identity on the transcript and not on the a
   });
 });
 
+test("a page note's summary is display-only: the transcript keeps it, the agent's prompt is unchanged", async () => {
+  const long =
+    "D1: Re-approve the PR at head 2e5941be (verify the head is unchanged, approve, read back the review). Approval only, no merge." +
+    '\n\nContext data:\n{\n  "question": "d1",\n  "answer": "approve"\n}';
+  const base = { uid: "", prompt: long, selector: "form", tag: "choice", text: "#1016: approve" };
+  await withStore(async ({ store, session }) => {
+    await store.queuePrompts(session.key, { prompts: [{ ...base, summary: "#1016: approve" }] });
+    const updated = await store.findByKey(session.key);
+    assert.equal(updated.chat[0].summary, "#1016: approve");
+    assert.equal(updated.chat[0].text, long);
+    assert.deepEqual(updated.prompts[0], base);
+  });
+  // The same note without a summary delivers byte-for-byte the same prompt.
+  await withStore(async ({ store, session }) => {
+    await store.queuePrompts(session.key, { prompts: [base] });
+    const updated = await store.findByKey(session.key);
+    assert.equal(updated.chat[0].summary, undefined);
+    assert.deepEqual(updated.prompts[0], base);
+  });
+});
+
+test("a page note's summary is bounded and only a string", async () => {
+  await withStore(async ({ store, session }) => {
+    await store.queuePrompts(session.key, {
+      prompts: [
+        { uid: "", prompt: "a", selector: "", tag: "choice", text: "", summary: "x".repeat(500) },
+        { uid: "", prompt: "b", selector: "", tag: "choice", text: "", summary: { html: "<b>" } },
+      ],
+    });
+    const updated = await store.findByKey(session.key);
+    assert.equal(updated.chat[0].summary.length, 200);
+    assert.equal(updated.chat[1].summary, undefined);
+  });
+});
+
 test("queuePrompts does not duplicate chat or pending prompts for an already-accepted identity", async () => {
   await withStore(async ({ store, session }) => {
     const promptId = "bbbbbbbb-cccc-4ddd-8eee-ffffffffffff";

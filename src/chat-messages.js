@@ -469,6 +469,7 @@ export function chatEntryForPrompt(prompt, at) {
   if (!text && attachments.length === 0 && !promptId && !anchor) return null;
   const entry = { role: "user", kind, text, at: String(at || new Date().toISOString()) };
   if (promptId) entry.prompt_id = promptId;
+  if (typeof prompt.summary === "string" && prompt.summary) entry.summary = prompt.summary;
   if (anchor) entry.anchor = anchor;
   if (attachments.length) entry.attachments = attachments;
   return entry;
