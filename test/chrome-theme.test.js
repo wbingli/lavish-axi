@@ -68,18 +68,18 @@ function contrast(fg, bg, base = bg) {
   return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 }
 
-test("the default theme is brass and its tokens are exactly the stylesheet's defaults", () => {
-  assert.equal(DEFAULT_CHROME_THEME, "brass");
-  const brass = CHROME_THEMES.find((theme) => theme.id === "brass");
-  assert.ok(brass);
-  for (const name of ROLE_TOKENS) assert.equal(brass.tokens[name], defaults.get(name), name);
+test("the default theme is paper and its tokens are exactly the stylesheet's defaults", () => {
+  assert.equal(DEFAULT_CHROME_THEME, "paper");
+  const paper = CHROME_THEMES.find((theme) => theme.id === "paper");
+  assert.ok(paper);
+  for (const name of ROLE_TOKENS) assert.equal(paper.tokens[name], defaults.get(name), name);
 });
 
 test("every theme defines every role token the chrome reads", () => {
   assert.ok(ROLE_TOKENS.length >= 40, `expected the full role layer, found ${ROLE_TOKENS.length}`);
   assert.deepEqual(
     CHROME_THEMES.map((theme) => theme.id),
-    ["brass", "paper", "daylight", "graphite", "fjord"],
+    ["paper", "brass", "daylight", "graphite", "fjord"],
   );
   for (const theme of CHROME_THEMES) {
     assert.deepEqual(Object.keys(theme.tokens).sort(), [...ROLE_TOKENS].sort(), theme.id);
@@ -116,6 +116,7 @@ test("every theme keeps chrome text at WCAG AA on every surface it sits on", () 
 test("resolveChromeTheme accepts only known theme ids", () => {
   assert.equal(resolveChromeTheme("paper"), "paper");
   assert.equal(resolveChromeTheme("brass"), "brass");
+  assert.equal(resolveChromeTheme("fjord"), "fjord");
   assert.equal(resolveChromeTheme("PAPER"), DEFAULT_CHROME_THEME);
   assert.equal(resolveChromeTheme("javascript:alert(1)"), DEFAULT_CHROME_THEME);
   assert.equal(resolveChromeTheme(null), DEFAULT_CHROME_THEME);
@@ -123,7 +124,7 @@ test("resolveChromeTheme accepts only known theme ids", () => {
 
 test("the theme stylesheet overrides the role layer for every non-default theme only", () => {
   const css = createChromeThemeCss();
-  assert.doesNotMatch(css, /data-lavish-theme="brass"/);
+  assert.doesNotMatch(css, /data-lavish-theme="paper"/);
   for (const theme of CHROME_THEMES.filter((entry) => entry.id !== DEFAULT_CHROME_THEME)) {
     const block = css.match(new RegExp(`:root\\[data-lavish-theme="${theme.id}"\\]\\s*\\{([^}]*)\\}`));
     assert.ok(block, theme.id);
@@ -150,12 +151,12 @@ test("the boot script applies a stored theme before first paint and ignores anyt
     new Function("document", "localStorage", boot)(document, localStorage);
     return attributes.get("data-lavish-theme") ?? null;
   };
-  assert.equal(run("paper"), "paper");
+  assert.equal(run("brass"), "brass");
   assert.equal(run("fjord"), "fjord");
-  assert.equal(run("brass"), null);
+  assert.equal(run("paper"), null);
   assert.equal(run('paper"><script>'), null);
   assert.equal(run(null), null);
-  assert.equal(run("paper", { throwOnRead: true }), null);
+  assert.equal(run("brass", { throwOnRead: true }), null);
 });
 
 test("serialized themes carry what the picker and the annotation card need, nothing executable", () => {
@@ -169,7 +170,8 @@ test("serialized themes carry what the picker and the annotation card need, noth
     assert.equal(typeof theme.description, "string");
     assert.match(theme.swatch.ground, /^#[0-9a-f]{6}$/i);
     assert.match(theme.swatch.accent, /^#[0-9a-f]{6}$/i);
-    if (theme.id === DEFAULT_CHROME_THEME) {
+    // The card paints Brass from its own stylesheet, so only Brass sends no tokens.
+    if (theme.id === "brass") {
       assert.equal(theme.sdk, null);
       continue;
     }

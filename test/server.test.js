@@ -438,11 +438,12 @@ test("createChromeHtml applies a stored theme in <head>, before the stylesheet p
   const head = html.slice(0, html.indexOf("</head>"));
   assert.match(
     head,
-    /<link rel="stylesheet" href="\/chrome\.css">\n<style id="lavishThemes">[^<]*:root\[data-lavish-theme="paper"\]/,
+    /<link rel="stylesheet" href="\/chrome\.css">\n<style id="lavishThemes">[^<]*:root\[data-lavish-theme="brass"\]/,
   );
   assert.match(head, /<script data-lavish-theme-boot>try\{[^<]*lavish-axi:chrome-theme[^<]*<\/script>/);
   // The default theme is the stylesheet itself: nothing to override, nothing to select.
-  assert.doesNotMatch(head, /data-lavish-theme="brass"/);
+  assert.doesNotMatch(head, /data-lavish-theme="paper"/);
+  assert.match(head, /:root\[data-lavish-theme="brass"\]/);
 });
 
 test("createChromeHtml offers every theme as a radio in the More menu, default checked", () => {
@@ -459,26 +460,26 @@ test("createChromeHtml offers every theme as a radio in the More menu, default c
   ];
   assert.deepEqual(
     radios.map(([, id]) => id),
-    ["brass", "paper", "daylight", "graphite", "fjord"],
+    ["paper", "brass", "daylight", "graphite", "fjord"],
   );
   assert.deepEqual(
     radios.filter(([, , checked]) => checked === "true").map(([, id]) => id),
-    ["brass"],
+    ["paper"],
   );
-  assert.match(menu, /id="themeCurrent">Brass</);
+  assert.match(menu, /id="themeCurrent">Paper</);
 });
 
 test("createChromeHtml hands the chrome client its themes through the session JSON", () => {
   const html = createChromeHtml({ key: "abc", file: "/tmp/artifact.html" });
   const session = JSON.parse(html.match(/<script id="lavish-session" type="application\/json">([^<]*)<\/script>/)[1]);
-  assert.equal(session.defaultChromeTheme, "brass");
+  assert.equal(session.defaultChromeTheme, "paper");
   assert.equal(session.chromeThemeStorageKey, "lavish-axi:chrome-theme");
   assert.deepEqual(
     session.chromeThemes.map((theme) => theme.id),
-    ["brass", "paper", "daylight", "graphite", "fjord"],
+    ["paper", "brass", "daylight", "graphite", "fjord"],
   );
-  assert.equal(session.chromeThemes[0].sdk, null);
-  assert.equal(session.chromeThemes[1].sdk["--accent"], "#a8461e");
+  assert.equal(session.chromeThemes[0].sdk["--accent"], "#a8461e");
+  assert.equal(session.chromeThemes[1].sdk, null);
 });
 
 test("the accepted image types the chrome enforces and offers come from one value", () => {
@@ -847,7 +848,8 @@ test("chrome declares the Lavish design-system tokens", async () => {
   assert.match(css, /--text-display:92px/);
   assert.match(css, /--lh-display:1/);
   assert.match(css, /--space-32:64px/);
-  assert.match(css, /--shadow-floating:0 20px 70px rgba\(0,0,0,.35\)/);
+  // The default (Paper) floating shadow; Brass keeps its darker one as a theme override.
+  assert.match(css, /--shadow-floating:0 20px 70px rgba\(20,20,19,.18\)/);
   assert.match(css, /--ease:cubic-bezier\(.2,.6,.2,1\)/);
   assert.match(css, /--dur-slow:320ms/);
   assert.match(css, /--bar-h:56px/);
@@ -6248,7 +6250,7 @@ test("ended session shows an overlay card over the dimmed chrome", async () => {
   assert.doesNotMatch(html, /The agent polling loop can stop\./);
   assert.match(css, /\.ended-overlay\{[^}]*inset:var\(--bar-h\) 0 0 0/);
   assert.match(css, /\.ended-overlay\{[^}]*background:var\(--scrim-strong\)/);
-  assert.match(css, /--scrim-strong:rgba\(15,17,21,\.86\)/);
+  assert.match(css, /--scrim-strong:rgba\(28,27,24,\.5\)/);
   assert.match(css, /\.ended-title\{[^}]*font-family:var\(--font-serif\)/);
   assert.match(js, /endedOverlay\.hidden = false/);
   assert.match(js, /annotationSwitch\.disabled = true/);
@@ -6613,7 +6615,13 @@ test("the SDK applies the reviewer's chrome theme at startup, falling back to th
 
   const unknown = createSdkJs("abc", 0, "", { chromeTheme: "neon" });
   const fallback = JSON.parse(unknown.match(/, (\{"acceptedImageMime"[^\n]*\})\);\n\}\)\(\);$/)[1]);
-  assert.deepEqual(fallback.chromeTheme, { id: "brass", tokens: null });
+  assert.equal(fallback.chromeTheme.id, "paper");
+  assert.equal(fallback.chromeTheme.tokens["--accent"], "#a8461e");
+
+  // Brass is the card's own stylesheet, so it travels without tokens.
+  const brass = createSdkJs("abc", 0, "", { chromeTheme: "brass" });
+  const brassOptions = JSON.parse(brass.match(/, (\{"acceptedImageMime"[^\n]*\})\);\n\}\)\(\);$/)[1]);
+  assert.deepEqual(brassOptions.chromeTheme, { id: "brass", tokens: null });
 });
 
 test("only notes the page's own code queues carry a display summary", () => {

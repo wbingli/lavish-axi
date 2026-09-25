@@ -1,10 +1,14 @@
 // Chrome themes. The chrome's rules read every color from the role layer in `src/chrome.css`
-// `:root`; a theme is nothing but a full set of values for that layer. `brass` is the
-// stylesheet's own defaults and ships no override, so the unthemed chrome is unchanged.
+// `:root`; a theme is nothing but a full set of values for that layer. The default theme is the
+// stylesheet's own values and ships no override. This fork defaults to Paper; Brass, the
+// upstream look, is an override like the others.
 // `chrome-client.js` is served raw and cannot import this module, so the picker and the
 // annotation card receive what they need through the session JSON (`serializeChromeThemes`).
 
-export const DEFAULT_CHROME_THEME = "brass";
+export const DEFAULT_CHROME_THEME = "paper";
+// The annotation card inside the artifact frame paints Brass from its own stylesheet; that theme
+// needs no tokens sent to it, every other one does.
+export const CARD_BUILTIN_THEME = "brass";
 export const CHROME_THEME_STORAGE_KEY = "lavish-axi:chrome-theme";
 
 /**
@@ -82,10 +86,41 @@ function roleTokens(p) {
 /** @type {ChromeTheme[]} */
 export const CHROME_THEMES = [
   {
+    id: "paper",
+    name: "Paper",
+    description: "Warm light",
+    tokens: roleTokens({
+      scheme: "light",
+      bg: "#fffefb",
+      panel: "#f7f5ef",
+      bar: "#f1eee6",
+      elevated: "#ffffff",
+      fg: "#141413",
+      fgMuted: "#3d3d3a",
+      fgDim: "#4a4943",
+      fgFaint: "#5f5e57",
+      fgLabel: "#6b6a63",
+      border: "#ddd8cc",
+      borderSubtle: "#e8e4da",
+      borderStrong: "#c9c3b5",
+      accent: "#a8461e",
+      accentHover: "#8f3a17",
+      accentInk: "#ffffff",
+      danger: "#b3261e",
+      hover: "#ebe7dc",
+      rowActive: "#efebe2",
+      warn: "#7a5500",
+      warnInk: "#ffffff",
+      warnBg: "#f8edcf",
+      warnBgHover: "#f2e1b3",
+      veil: "#1c1b18",
+      shadow: "#141413",
+    }),
+  },
+  {
     id: "brass",
     name: "Brass",
     description: "Lavish dark",
-    // Exactly the stylesheet's :root values; test/chrome-theme.test.js holds them together.
     tokens: {
       "--bg": "#0f1115",
       "--bg-panel": "#11141a",
@@ -130,38 +165,6 @@ export const CHROME_THEMES = [
       "--scrim-heavy": "rgba(15, 17, 21, 0.92)",
       "--shadow-scroll-edge": "0 -10px 14px -10px rgba(0, 0, 0, 0.55)",
     },
-  },
-  {
-    id: "paper",
-    name: "Paper",
-    description: "Warm light",
-    tokens: roleTokens({
-      scheme: "light",
-      bg: "#fffefb",
-      panel: "#f7f5ef",
-      bar: "#f1eee6",
-      elevated: "#ffffff",
-      fg: "#141413",
-      fgMuted: "#3d3d3a",
-      fgDim: "#4a4943",
-      fgFaint: "#5f5e57",
-      fgLabel: "#6b6a63",
-      border: "#ddd8cc",
-      borderSubtle: "#e8e4da",
-      borderStrong: "#c9c3b5",
-      accent: "#a8461e",
-      accentHover: "#8f3a17",
-      accentInk: "#ffffff",
-      danger: "#b3261e",
-      hover: "#ebe7dc",
-      rowActive: "#efebe2",
-      warn: "#7a5500",
-      warnInk: "#ffffff",
-      warnBg: "#f8edcf",
-      warnBgHover: "#f2e1b3",
-      veil: "#1c1b18",
-      shadow: "#141413",
-    }),
   },
   {
     id: "daylight",
@@ -305,10 +308,10 @@ export function serializeChromeThemes() {
       name: theme.name,
       description: theme.description,
       swatch: { ground: t["--bg-bar"], accent: t["--accent"] },
-      // The card's own stylesheet already paints the default theme; null tells it to drop
-      // any override it holds rather than restate those values here.
+      // The card's own stylesheet already paints Brass; null tells it to drop any override it
+      // holds rather than restate those values here.
       sdk:
-        theme.id === DEFAULT_CHROME_THEME
+        theme.id === CARD_BUILTIN_THEME
           ? null
           : {
               "--color-scheme": t["--color-scheme"],

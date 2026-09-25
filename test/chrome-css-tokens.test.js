@@ -33,6 +33,6 @@ test("chrome.css rules read colors from role tokens, never the raw palette", () 
 
 test("color-scheme follows the role token so a light theme gets light native controls", () => {
   const { root, rules } = splitRootBlock(chromeCss);
-  assert.match(root, /--color-scheme:\s*dark;/);
+  assert.match(root, /--color-scheme:\s*light;/);
   assert.match(rules, /body\.lavish\s*\{\s*color-scheme:\s*var\(--color-scheme\);/);
 });

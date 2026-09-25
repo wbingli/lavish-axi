@@ -8365,7 +8365,7 @@ test("a mark naming an undeclared revision never reaches the legend", async () =
 const themedSessionData = {
   ...defaultSessionData,
   chromeThemes: serializeChromeThemes(),
-  defaultChromeTheme: "brass",
+  defaultChromeTheme: "paper",
   chromeThemeStorageKey: "lavish-axi:chrome-theme",
 };
 
@@ -8381,22 +8381,22 @@ function checkedSwatches(chrome) {
 }
 
 test("a stored chrome theme selects its swatch and label and themes the annotation card on load", async () => {
-  const localStore = new Map([["lavish-axi:chrome-theme", "paper"]]);
+  const localStore = new Map([["lavish-axi:chrome-theme", "daylight"]]);
   const chrome = await createChromeHarness({
     sessionData: themedSessionData,
     localStore,
     artifactSrc: "/artifact/abc/index.html",
   });
-  const paper = serializeChromeThemes().find((theme) => theme.id === "paper");
+  const daylight = serializeChromeThemes().find((theme) => theme.id === "daylight");
 
-  assert.equal(chrome.element("html")["data-lavish-theme"], "paper");
-  assert.deepEqual(checkedSwatches(chrome), ["paper"]);
-  assert.equal(chrome.element("themeCurrent").textContent, "Paper");
+  assert.equal(chrome.element("html")["data-lavish-theme"], "daylight");
+  assert.deepEqual(checkedSwatches(chrome), ["daylight"]);
+  assert.equal(chrome.element("themeCurrent").textContent, "Daylight");
   // The frame's load re-sends the theme, because a reload is a fresh document with a fresh SDK.
-  assert.deepEqual(themeMessages(chrome).at(-1), { type: "lavish:setTheme", id: "paper", tokens: paper.sdk });
+  assert.deepEqual(themeMessages(chrome).at(-1), { type: "lavish:setTheme", id: "daylight", tokens: daylight.sdk });
 });
 
-test("choosing a chrome theme applies it, remembers it, and re-themes the card; brass clears the override", async () => {
+test("choosing a chrome theme applies it, remembers it, and re-themes the card; the default clears the override", async () => {
   const localStore = new Map();
   const chrome = await createChromeHarness({ sessionData: themedSessionData, localStore });
   const fjord = serializeChromeThemes().find((theme) => theme.id === "fjord");
@@ -8409,10 +8409,16 @@ test("choosing a chrome theme applies it, remembers it, and re-themes the card; 
   assert.deepEqual(themeMessages(chrome).at(-1), { type: "lavish:setTheme", id: "fjord", tokens: fjord.sdk });
 
   chrome.element("themeSwatch-brass").click();
-  assert.equal("data-lavish-theme" in chrome.element("html"), false);
-  assert.equal(localStore.get("lavish-axi:chrome-theme"), "brass");
-  assert.deepEqual(checkedSwatches(chrome), ["brass"]);
+  assert.equal(chrome.element("html")["data-lavish-theme"], "brass");
+  // Brass is the card's own stylesheet, so no tokens travel with it.
   assert.deepEqual(themeMessages(chrome).at(-1), { type: "lavish:setTheme", id: "brass", tokens: null });
+
+  const paper = serializeChromeThemes().find((theme) => theme.id === "paper");
+  chrome.element("themeSwatch-paper").click();
+  assert.equal("data-lavish-theme" in chrome.element("html"), false);
+  assert.equal(localStore.get("lavish-axi:chrome-theme"), "paper");
+  assert.deepEqual(checkedSwatches(chrome), ["paper"]);
+  assert.deepEqual(themeMessages(chrome).at(-1), { type: "lavish:setTheme", id: "paper", tokens: paper.sdk });
 });
 
 test("an unknown stored theme or missing storage leaves the default theme in place", async () => {
@@ -8421,10 +8427,10 @@ test("an unknown stored theme or missing storage leaves the default theme in pla
     localStore: new Map([["lavish-axi:chrome-theme", "neon"]]),
   });
   assert.equal("data-lavish-theme" in unknown.element("html"), false);
-  assert.deepEqual(checkedSwatches(unknown), ["brass"]);
+  assert.deepEqual(checkedSwatches(unknown), ["paper"]);
 
   const noStorage = await createChromeHarness({ sessionData: themedSessionData });
-  assert.deepEqual(checkedSwatches(noStorage), ["brass"]);
+  assert.deepEqual(checkedSwatches(noStorage), ["paper"]);
   noStorage.element("themeSwatch-daylight").click();
   assert.equal(noStorage.element("html")["data-lavish-theme"], "daylight");
 });
