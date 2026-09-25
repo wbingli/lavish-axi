@@ -7,7 +7,7 @@ export const MERMAID_VERSION = "11.15.0";
 // This fork's shared artifact themes, served by jsDelivr from a pinned tag of the fork so a
 // published page never changes under its reader. Bump the tag (and push it) when
 // src/design/lavish-themes.css changes.
-export const LAVISH_THEMES_REF = "lavish-themes-v1";
+export const LAVISH_THEMES_REF = "lavish-themes-v2";
 export const LAVISH_THEMES = [
   "lavish",
   "lavish-paper",
@@ -250,7 +250,7 @@ export function createDesignOutput() {
     theme_usage: [
       'Default to `<html data-theme="lavish">` (the CDN snippet loads it): it follows the reviewer\'s Lavish editor theme - Paper, Brass, Daylight, Graphite or Fjord - while Lavish serves the page, and the OS light/dark setting when the file is opened directly. Use a fixed palette (`lavish-paper`, `lavish-brass`, `lavish-daylight`, `lavish-graphite`, `lavish-fjord`) only when the user wants one look regardless of the editor, and another DaisyUI theme only when the user names it. Avoid `luxury` for review surfaces - its base text is gold and its `primary` is white, so every paragraph already reads as emphasis.',
       "Spend `primary` only on what needs the reviewer - an open question, the chosen option, the control that submits it. Headings, links, labels, section numbers, and finished work stay in the base text colors; an accent that marks everything marks nothing.",
-      'In the lavish themes `primary` is the decision accent, `success` is done, `warning` marks what acts outside the page, and `error` is danger; `secondary`, `accent`, `neutral` and `info` are plain ink, so reach for `primary` alone to draw the eye. `<mark>` renders as a highlighter stroke - use it once per question, on the fact that decides it. Helpers: `lv-ink-2` / `lv-ink-3` for quieter and muted text; `<span class="lv-effect lv-effect-out">Posts 3 messages</span>`, `<span class="lv-effect">No side effects</span>` and `lv-effect lv-done` beside options; `<label class="lv-option"><input type="radio" ...> ...</label>` for a visible choice that rings when selected.',
+      'In the lavish themes `primary` is the decision accent, `success` is done, `warning` marks what acts outside the page, and `error` is danger; `secondary`, `accent`, `neutral` and `info` are plain ink, so reach for `primary` alone to draw the eye. `<mark>` renders as a highlighter stroke - use it once per question, on the fact that decides it. Helpers (use them for side-effect chips instead of tinting `warning` yourself, which only reads well in light palettes): `lv-ink-2` / `lv-ink-3` for quieter and muted text; `<span class="lv-effect lv-effect-out">Posts 3 messages</span>`, `<span class="lv-effect">No side effects</span>` and `lv-effect lv-done` beside options; `<label class="lv-option"><input type="radio" ...> ...</label>` for a visible choice that rings when selected.',
       'A page that does not use DaisyUI can still follow the editor: Lavish sets `data-lavish-theme` on the artifact\'s `<html>` (`paper`, `brass`, `daylight`, `graphite`, `fjord`), so key hand-written palettes off `html[data-lavish-theme="paper"]` and friends, with a complete default for when the file is opened directly.',
       "Build text hierarchy from distinct text colors (for example `text-base-content` for questions and key facts, a quieter tone for explanations, a muted tone for sources and timestamps) rather than one color at stepped opacity, and keep every level at 4.5:1 contrast or better against its surface.",
       'Set a nested section theme with `<section data-theme="night">`.',

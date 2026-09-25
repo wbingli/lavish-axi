@@ -8,7 +8,9 @@
  *                                      lavish-daylight, lavish-graphite, lavish-fjord.
  *
  * Roles: primary = what needs the reviewer's decision (the only accent); success = done;
- * warning = acts outside the page / attention; error = danger. Secondary, accent, neutral and
+ * warning = acts outside the page / attention; error = danger. Status fills follow DaisyUI's
+ * convention - a fill with readable -content on it and on a light tint of it - and the
+ * text-safe versions are --lv-done / --lv-attn (used by the lv-effect helpers). Secondary, accent, neutral and
  * info are plain ink, so a stray badge never adds a second accent. <mark> is a highlighter
  * stroke for the one fact that decides a question. Load after daisyui.css.
  */
@@ -31,12 +33,12 @@
   --color-neutral-content: #ffffff;
   --color-info: #3d3d3a;
   --color-info-content: #ffffff;
-  --color-success: #46652b;
-  --color-success-content: #ffffff;
-  --color-warning: #7a5500;
-  --color-warning-content: #ffffff;
-  --color-error: #b3261e;
-  --color-error-content: #ffffff;
+  --color-success: #6f9f3f;
+  --color-success-content: #0e1a05;
+  --color-warning: #e8a33d;
+  --color-warning-content: #1f1606;
+  --color-error: #e5534b;
+  --color-error-content: #1a0806;
   --radius-selector: 0.5rem;
   --radius-field: 0.625rem;
   --radius-box: 1rem;
@@ -158,12 +160,12 @@
   --color-neutral-content: #ffffff;
   --color-info: #334155;
   --color-info-content: #ffffff;
-  --color-success: #156b3a;
-  --color-success-content: #ffffff;
-  --color-warning: #8a4b00;
-  --color-warning-content: #ffffff;
-  --color-error: #c62828;
-  --color-error-content: #ffffff;
+  --color-success: #3fb67a;
+  --color-success-content: #04170c;
+  --color-warning: #f2b01e;
+  --color-warning-content: #1f1606;
+  --color-error: #ef5350;
+  --color-error-content: #1a0806;
   --radius-selector: 0.5rem;
   --radius-field: 0.625rem;
   --radius-box: 1rem;

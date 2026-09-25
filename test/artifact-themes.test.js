@@ -120,6 +120,36 @@ test("every palette keeps text at WCAG AA on the surfaces it sits on", () => {
   }
 });
 
+// Agents style status chips DaisyUI's usual way: a light tint of the fill (bg-warning/35 or
+// color-mix) with the -content color on it. On the light palettes that must stay readable, not
+// only the solid fill. A dark palette cannot serve both - a solid bright fill needs dark ink, a
+// tint over a dark card needs light ink - which is why the guidance points side-effect chips at
+// the lv-effect helpers, readable in every palette.
+test("status content stays readable on a light tint of its fill in the light palettes", () => {
+  const mix = (fill, base, share) => {
+    const [a, b] = [fill, base].map((hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)));
+    return (
+      "#" +
+      a
+        .map((c, i) =>
+          Math.round(c * share + b[i] * (1 - share))
+            .toString(16)
+            .padStart(2, "0"),
+        )
+        .join("")
+    );
+  };
+  for (const name of PALETTES) {
+    const v = paletteVars(name).vars;
+    if (v["color-scheme"] !== "light") continue;
+    for (const role of ["success", "warning", "error"]) {
+      const tint = mix(v[`--color-${role}`], v["--color-base-100"], 0.35);
+      const ratio = contrast(v[`--color-${role}-content`], tint);
+      assert.ok(ratio >= 4.5, `lavish-${name}: ${role}-content on a 35% ${role} tint is ${ratio.toFixed(2)}:1`);
+    }
+  }
+});
+
 test("the only accent is primary: secondary, accent, neutral and info are plain ink", () => {
   for (const name of PALETTES) {
     const v = paletteVars(name).vars;
